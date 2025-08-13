@@ -21,7 +21,7 @@ namespace Jellyfin.Plugin.Pgsql.Database;
 /// The design time factory for <see cref="JellyfinDbContext"/>.
 /// This is only used for the creation of migrations and not during runtime.
 /// </summary>
-internal sealed class PgSqlDesignTimeJellyfinDbFactory : IDesignTimeDbContextFactory<JellyfinDbContext>
+public class PgSqlDesignTimeJellyfinDbFactory : IDesignTimeDbContextFactory<JellyfinDbContext>
 {
     public JellyfinDbContext CreateDbContext(string[] args)
     {
