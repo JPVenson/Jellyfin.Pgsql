@@ -51,6 +51,11 @@ public sealed class PgSqlDatabaseProvider : IJellyfinDatabaseProvider
             {
                 pgSqlOptions.MigrationsAssembly(GetType().Assembly.FullName);
             });
+
+        if (bool.TryParse(Environment.GetEnvironmentVariable("EFCORE_ENABLE_SENSITIVE_DATA_LOGGING"), out bool enableSensitiveDataLogging))
+        {
+            options.EnableSensitiveDataLogging(enableSensitiveDataLogging);
+        }
     }
 
     /// <inheritdoc/>
