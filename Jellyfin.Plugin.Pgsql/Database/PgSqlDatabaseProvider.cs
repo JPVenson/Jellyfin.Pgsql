@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Database.Implementations;
 using Jellyfin.Database.Implementations.DbConfiguration;
+using Jellyfin.Database.Implementations.Locking;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Controller.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -51,6 +52,15 @@ public sealed class PgSqlDatabaseProvider : IJellyfinDatabaseProvider
             {
                 pgSqlOptions.MigrationsAssembly(GetType().Assembly.FullName);
             });
+
+        if (bool.TryParse(Environment.GetEnvironmentVariable("EFCORE_ENABLE_SENSITIVE_DATA_LOGGING"), out bool enableSensitiveDataLogging))
+        {
+            options.EnableSensitiveDataLogging(enableSensitiveDataLogging);
+        }
+
+        // Add PostgreSQL-optimized interceptors for deadlock and connection retry handling
+        options.AddInterceptors(new PgSqlRetryInterceptor(_logger));
+        options.AddInterceptors(new PgSqlTransactionInterceptor(_logger));
     }
 
     /// <inheritdoc/>
