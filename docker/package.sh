@@ -35,6 +35,10 @@ cp ../Jellyfin.Plugin.Pgsql/Database/PgSqlRetryInterceptor.cs ./Jellyfin.Plugin.
 cp ../Jellyfin.Plugin.Pgsql/Database/PgSqlTransactionInterceptor.cs ./Jellyfin.Plugin.Pgsql/Database/
 cp ../Jellyfin.Plugin.Pgsql/Migrations/20250618214615_PgSQL_Init.cs ./Jellyfin.Plugin.Pgsql/Migrations/
 cp ../Jellyfin.Plugin.Pgsql/Migrations/20250618214615_PgSQL_Init.Designer.cs ./Jellyfin.Plugin.Pgsql/Migrations/
+cp ../Jellyfin.Plugin.Pgsql/Migrations/20250814000001_RemoveDuplicatePeopleStage1.cs ./Jellyfin.Plugin.Pgsql/Migrations/
+cp ../Jellyfin.Plugin.Pgsql/Migrations/20250814000001_RemoveDuplicatePeopleStage1.Designer.cs ./Jellyfin.Plugin.Pgsql/Migrations/
+cp ../Jellyfin.Plugin.Pgsql/Migrations/20250814000003_RemoveDuplicatePeopleStage3.cs ./Jellyfin.Plugin.Pgsql/Migrations/
+cp ../Jellyfin.Plugin.Pgsql/Migrations/20250814000003_RemoveDuplicatePeopleStage3.Designer.cs ./Jellyfin.Plugin.Pgsql/Migrations/
 cp ../Jellyfin.Plugin.Pgsql/Migrations/JellyfinDbContextModelSnapshot.cs ./Jellyfin.Plugin.Pgsql/Migrations/
 
 # Set permissions on directories
@@ -51,6 +55,10 @@ chmod 644 Dockerfile entrypoint.sh database.xml jellyfin.ruleset Jellyfin.Plugin
     Jellyfin.Plugin.Pgsql/Database/PgSqlTransactionInterceptor.cs \
     Jellyfin.Plugin.Pgsql/Migrations/20250618214615_PgSQL_Init.cs \
     Jellyfin.Plugin.Pgsql/Migrations/20250618214615_PgSQL_Init.Designer.cs \
+    Jellyfin.Plugin.Pgsql/Migrations/20250814000001_RemoveDuplicatePeopleStage1.cs \
+    Jellyfin.Plugin.Pgsql/Migrations/20250814000001_RemoveDuplicatePeopleStage1.Designer.cs \
+    Jellyfin.Plugin.Pgsql/Migrations/20250814000003_RemoveDuplicatePeopleStage3.cs \
+    Jellyfin.Plugin.Pgsql/Migrations/20250814000003_RemoveDuplicatePeopleStage3.Designer.cs \
     Jellyfin.Plugin.Pgsql/Migrations/JellyfinDbContextModelSnapshot.cs
 
 tar -czf "$PACKAGE_NAME" \
