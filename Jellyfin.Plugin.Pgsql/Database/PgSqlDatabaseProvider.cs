@@ -44,25 +44,9 @@ public sealed class PgSqlDatabaseProvider : IJellyfinDatabaseProvider
     /// <inheritdoc/>
     public void Initialise(DbContextOptionsBuilder options, DatabaseConfigurationOptions databaseConfiguration)
     {
-        static T? GetOption<T>(ICollection<CustomDatabaseOption>? options, string key, Func<string, T> converter, Func<T>? defaultValue = null)
-        {
-            if (options is null)
-            {
-                return defaultValue is not null ? defaultValue() : default;
-            }
-
-            var value = options.FirstOrDefault(e => e.Key.Equals(key, StringComparison.OrdinalIgnoreCase));
-            if (value is null)
-            {
-                return defaultValue is not null ? defaultValue() : default;
-            }
-
-            return converter(value.Value);
-        }
-
         var customOptions = databaseConfiguration.CustomProviderOptions?.Options;
 
-        var connectionBuilder = GetConnectionBuilder();
+        var connectionBuilder = GetConnectionBuilder(customOptions);
         connectionBuilder.ApplicationName = $"jellyfin+{FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()!.Location).FileVersion}";
 
         options
@@ -71,7 +55,7 @@ public sealed class PgSqlDatabaseProvider : IJellyfinDatabaseProvider
                 pgSqlOptions.MigrationsAssembly(GetType().Assembly.FullName);
             });
 
-        var enableSensitiveDataLogging = GetOption(customOptions, "EnableSensitiveDataLogging", e => e.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase), () => false);
+        var enableSensitiveDataLogging = GetCustomDatabaseOption(customOptions, "EnableSensitiveDataLogging", e => e.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase), () => false);
         if (enableSensitiveDataLogging)
         {
             options.EnableSensitiveDataLogging(enableSensitiveDataLogging);
@@ -142,7 +126,7 @@ public sealed class PgSqlDatabaseProvider : IJellyfinDatabaseProvider
         var backupFolder = Path.Combine(_applicationPaths.DataPath, BackupFolderName);
         Directory.CreateDirectory(backupFolder);
 
-        var connectionBuilder = GetConnectionBuilder();
+        var connectionBuilder = GetConnectionBuilder(null);
         var backupFile = Path.Combine(backupFolder, $"{key}_{connectionBuilder.Database}.sql");
 
         var process = new Process
@@ -180,7 +164,7 @@ public sealed class PgSqlDatabaseProvider : IJellyfinDatabaseProvider
     {
         NpgsqlConnection.ClearAllPools();
 
-        var connectionBuilder = GetConnectionBuilder();
+        var connectionBuilder = GetConnectionBuilder(null);
         var backupFile = Path.Combine(_applicationPaths.DataPath, BackupFolderName, $"{key}_{connectionBuilder.Database}.sql");
 
         if (!File.Exists(backupFile))
@@ -221,7 +205,7 @@ public sealed class PgSqlDatabaseProvider : IJellyfinDatabaseProvider
     /// <inheritdoc/>
     public Task DeleteBackup(string key)
     {
-        var connectionBuilder = GetConnectionBuilder();
+        var connectionBuilder = GetConnectionBuilder(null);
         var backupFile = Path.Combine(_applicationPaths.DataPath, BackupFolderName, $"{key}_{connectionBuilder.Database}.sql");
 
         if (!File.Exists(backupFile))
@@ -252,8 +236,27 @@ public sealed class PgSqlDatabaseProvider : IJellyfinDatabaseProvider
         _logger.LogInformation("PostgreSQL database tables purged successfully");
     }
 
-    private NpgsqlConnectionStringBuilder GetConnectionBuilder()
+    private T? GetCustomDatabaseOption<T>(ICollection<CustomDatabaseOption>? options, string key, Func<string, T> converter, Func<T>? defaultValue = null)
     {
+        if (options is null)
+        {
+            return defaultValue is not null ? defaultValue() : default;
+        }
+
+        var value = options.FirstOrDefault(e => e.Key.Equals(key, StringComparison.OrdinalIgnoreCase));
+        if (value is null)
+        {
+            return defaultValue is not null ? defaultValue() : default;
+        }
+
+        return converter(value.Value);
+    }
+
+    private NpgsqlConnectionStringBuilder GetConnectionBuilder(ICollection<CustomDatabaseOption>? options)
+    {
+        var includeErrorDetail = GetCustomDatabaseOption(options, "IncludeErrorDetail", e => e.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase), () => false);
+        var logParameters = GetCustomDatabaseOption(options, "LogParameters", e => e.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase), () => false);
+
         var connectionBuilder = new NpgsqlConnectionStringBuilder
         {
             Host = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "jellyfin",
@@ -263,13 +266,12 @@ public sealed class PgSqlDatabaseProvider : IJellyfinDatabaseProvider
             Password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? throw new InvalidOperationException("PostgreSQL password must be provided via POSTGRES_PASSWORD environment variable")
         };
 
-        // Configure optional Npgsql parameters from environment variables
-        if (bool.TryParse(Environment.GetEnvironmentVariable("NPGSQL_INCLUDE_ERROR_DETAIL"), out bool includeErrorDetail))
+        if (includeErrorDetail)
         {
             connectionBuilder.IncludeErrorDetail = includeErrorDetail;
         }
 
-        if (bool.TryParse(Environment.GetEnvironmentVariable("NPGSQL_LOG_PARAMETERS"), out bool logParameters))
+        if (logParameters)
         {
             connectionBuilder.LogParameters = logParameters;
         }
