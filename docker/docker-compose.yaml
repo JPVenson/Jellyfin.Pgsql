@@ -20,19 +20,19 @@ services:
       - /path/to/media/example:/media/example:ro
   postgres:
     environment:
-      PGDATA: /var/lib/postgresql/17/docker # using directory convention from Postgres 18 to facilitate future upgrades
       POSTGRES_DB: jellyfin
-      POSTGRES_INITDB_WALDIR: /var/lib/postgresql-wal/17/docker # if you would like to put WAL on a separate filesystem
+      POSTGRES_INITDB_WALDIR: /var/lib/postgresql-wal/18/docker # if you would like to put WAL on a separate filesystem
 #      POSTGRES_PASSWORD: set a secure password
       POSTGRES_USER: jellyfin
-    image: postgres:17
+      PGUSER: jellyfin
+    image: postgres:18
     healthcheck:
       interval: 10s
       retries: 5
       start_period: 30s
       test:
-        - CMD-SHELL
-        - pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+        - CMD
+        - pg_isready
       timeout: 10s
 #    user: 'uid:gid' set a different non-root user to run postgres
     volumes:
