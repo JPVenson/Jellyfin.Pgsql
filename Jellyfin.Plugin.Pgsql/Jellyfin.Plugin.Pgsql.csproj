@@ -14,24 +14,24 @@
     <PackageReference Include="Jellyfin.Controller" Version="10.11.0-rc5" PrivateAssets="all" />
     <PackageReference Include="Jellyfin.Model" Version="10.11.0-rc5" PrivateAssets="all" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    <PackageReference Include="Npgsql" Version="9.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.9" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.9" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.9" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.9" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.9" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.9" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.9" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.9" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.9" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
+    <PackageReference Include="Npgsql" Version="9.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
