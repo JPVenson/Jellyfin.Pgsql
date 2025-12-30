@@ -1,0 +1,12 @@
+[
+    {
+        "guid": "ecb9be01-627b-4904-a28e-8d0d5b481272",
+        "name": "Postgre-SQL For Jellyfin",
+        "description": "Experimental PostgreSQL provider for Jellyfin.",
+        "overview": "Jellyfin",
+        "owner": "JPVenson",
+        "category": "General",
+        "versions": [
+        ]
+    }
+]

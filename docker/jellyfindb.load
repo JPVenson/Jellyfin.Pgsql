@@ -1,0 +1,6 @@
+load database
+    from sqlite:///config/data/jellyfin.db
+    into pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+
+with quote identifiers, data only, truncate, drop indexes
+excluding table names like '__EFMigrationsHistory'
