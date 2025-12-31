@@ -23,6 +23,9 @@ services:
         - POSTGRES_DB=jellyfin
         - POSTGRES_USER=jellyfin
         - POSTGRES_PASSWORD=jellyfin
+      # Optional settings bellow, uncomment if you want to connect using SSL
+      # - POSTGRES_SSLMODE=Require
+      # - POSTGRES_TRUSTSERVERCERTIFICATE=true
 ```
 
 # Build

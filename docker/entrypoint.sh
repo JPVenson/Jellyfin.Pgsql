@@ -27,6 +27,15 @@ fi
 # Build connection string for migration
 ConnectionString="Password=${POSTGRES_PASSWORD};User ID=${POSTGRES_USER};Host=${POSTGRES_HOST};Port=${POSTGRES_PORT};Database=${POSTGRES_DB}"
 
+# Add SSL options if provided
+if [ -n "${POSTGRES_SSLMODE}" ]; then
+    ConnectionString="${ConnectionString};SSL Mode=${POSTGRES_SSLMODE}"
+fi
+
+if [ -n "${POSTGRES_TRUSTSERVERCERTIFICATE}" ]; then
+    ConnectionString="${ConnectionString};Trust Server Certificate=${POSTGRES_TRUSTSERVERCERTIFICATE}"
+fi
+
 # Update database.xml with connection string
 xmlstarlet edit -L -u '//DatabaseConfigurationOptions/CustomProviderOptions/ConnectionString' -v "${ConnectionString}" /config/config/database.xml
 
