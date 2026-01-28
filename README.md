@@ -59,3 +59,9 @@ Run `dotnet ef migrations add {MIGRATION_NAME} --project "/workspaces/Jellyfin.P
 To create a new release, first sync all Jellyfin server changes then create a new migration as seen above. After that create a new efbundle:
 `dotnet ef migrations bundle -o docker/jellyfin.PgsqlMigrator.dll -r linux-x64 --self-contained --project "/workspaces/Jellyfin.Pgsql/Jellyfin.Plugin.Pgsql" --  --migration-provider Jellyfin-PgSql`
 Then build the container
+
+
+# Migration Instructions (ADVANCED)
+
+To migrate your JF install to a custom database (not using the docker image), first install jellyfin with the pgsql plugin and configure it to point to an existing empty database. Then proceed to run jellyfin once, this will seed the database and its migration history. Stop your JF instance after its been started once (no need to setup fully though the startup wizzard). 
+Then install the pgloader tool `apt install pgloader`. After that use the load file in `/docker/jellyfindb.load` to transfer your sqlite db into the postgres db like `pgloader /jellyfin-pgsql/jellyfindb.load` (Adapt the jellyfindb.load file accordingly to point towards your old jellyfin.db and your postgres instance).
