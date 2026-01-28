@@ -8,7 +8,8 @@
     // reads the extensions list and installs them
     "postAttachCommand": "cat .vscode/extensions.json | jq -r .recommendations[] | xargs -n 1 code --install-extension",
     "forwardPorts": [
-        "pgadmin:8081"
+        "pgadmin:8081",
+        "jellydb:5432",
     ],
     "portsAttributes": {
         "8081": {
