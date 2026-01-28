@@ -3,6 +3,7 @@ using System;
 using Jellyfin.Database.Implementations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Jellyfin.Plugin.Pgsql.Migrations
 {
     [DbContext(typeof(JellyfinDbContext))]
-    partial class JellyfinDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260128200059_10.11.6-1")]
+    partial class _101161
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
