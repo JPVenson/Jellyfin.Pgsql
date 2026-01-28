@@ -13,7 +13,7 @@ namespace Jellyfin.Plugin.Pgsql.Migrations
 {
     [DbContext(typeof(JellyfinDbContext))]
     [Migration("20260128200059_10.11.6-1")]
-    partial class _101161
+    partial class Jellyfin101161
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
