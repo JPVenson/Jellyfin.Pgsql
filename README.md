@@ -4,7 +4,7 @@ This adds postgres SQL support via an plugin to the jellyfin server. There are s
 
 # How to use it
 
-You can use your existing jellyfin compose file and change the image accordingly to: `ghcr.io/jpvenson/jellyfin.pgsql:10.11.0-1`.
+You can use your existing jellyfin compose file and change the image accordingly to: `ghcr.io/jpvenson/jellyfin.pgsql:10.11.6-1`.
 
 You need to add the connection paramters as enviorment variables in your compose file:
 
@@ -12,7 +12,7 @@ You need to add the connection paramters as enviorment variables in your compose
 
 services:
   jellyfin:
-    image: ghcr.io/jpvenson/jellyfin.pgsql:10.11.0-1
+    image: ghcr.io/jpvenson/jellyfin.pgsql:10.11.6-1
     volumes:
         - /path/to/config:/config
         - /path/to/cache:/cache
