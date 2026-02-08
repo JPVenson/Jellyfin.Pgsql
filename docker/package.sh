@@ -44,8 +44,15 @@ cp ../Jellyfin.Plugin.Pgsql/Migrations/JellyfinDbContextModelSnapshot.cs ./Jelly
 # Set permissions on directories
 chmod 755 Jellyfin.Plugin.Pgsql Jellyfin.Plugin.Pgsql/Configuration Jellyfin.Plugin.Pgsql/Database Jellyfin.Plugin.Pgsql/Migrations
 
+# Create docker subdirectory for files Dockerfile expects there
+mkdir -p docker
+cp entrypoint.sh docker/
+cp database.xml docker/
+cp jellyfindb.load docker/
+cp jellyfin.PgsqlMigrator.dll docker/ 2>/dev/null || true
+
 # Set permissions on files
-chmod 644 Dockerfile entrypoint.sh database.xml jellyfin.ruleset Jellyfin.Plugin.Pgsql.sln build.yaml \
+chmod 644 Dockerfile docker/entrypoint.sh docker/database.xml jellyfin.ruleset Jellyfin.Plugin.Pgsql.sln build.yaml \
     Jellyfin.Plugin.Pgsql/Jellyfin.Plugin.Pgsql.csproj \
     Jellyfin.Plugin.Pgsql/Plugin.cs \
     Jellyfin.Plugin.Pgsql/Configuration/PluginConfiguration.cs \
@@ -64,8 +71,7 @@ chmod 644 Dockerfile entrypoint.sh database.xml jellyfin.ruleset Jellyfin.Plugin
 tar -czf "$PACKAGE_NAME" \
     --uid=0 --gid=0 \
     Dockerfile \
-    entrypoint.sh \
-    database.xml \
+    docker/ \
     jellyfin.ruleset \
     Jellyfin.Plugin.Pgsql.sln \
     build.yaml \
@@ -74,6 +80,7 @@ tar -czf "$PACKAGE_NAME" \
 # Clean up temporary files
 rm jellyfin.ruleset Jellyfin.Plugin.Pgsql.sln build.yaml
 rm -rf Jellyfin.Plugin.Pgsql/
+rm -rf docker/
 
 # Show package size
 SIZE=$(ls -lh "$PACKAGE_NAME" | awk '{print $5}')
