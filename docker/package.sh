@@ -33,8 +33,12 @@ cp ../Jellyfin.Plugin.Pgsql/Configuration/configPage.html ./Jellyfin.Plugin.Pgsq
 cp ../Jellyfin.Plugin.Pgsql/Database/PgSqlDatabaseProvider.cs ./Jellyfin.Plugin.Pgsql/Database/
 cp ../Jellyfin.Plugin.Pgsql/Migrations/20250618214615_PgSQL_Init.cs ./Jellyfin.Plugin.Pgsql/Migrations/
 cp ../Jellyfin.Plugin.Pgsql/Migrations/20250618214615_PgSQL_Init.Designer.cs ./Jellyfin.Plugin.Pgsql/Migrations/
-cp ../Jellyfin.Plugin.Pgsql/Migrations/20250913211637_AddProperParentChildRelationBaseItemWithCascade.Designer.cs ./Jellyfin.Plugin.Pgsql/Migrations/
 cp ../Jellyfin.Plugin.Pgsql/Migrations/20250913211637_AddProperParentChildRelationBaseItemWithCascade.cs ./Jellyfin.Plugin.Pgsql/Migrations/
+cp ../Jellyfin.Plugin.Pgsql/Migrations/20250913211637_AddProperParentChildRelationBaseItemWithCascade.Designer.cs ./Jellyfin.Plugin.Pgsql/Migrations/
+cp ../Jellyfin.Plugin.Pgsql/Migrations/20250929202529_Update_10.11-RC8.cs ./Jellyfin.Plugin.Pgsql/Migrations/
+cp ../Jellyfin.Plugin.Pgsql/Migrations/20250929202529_Update_10.11-RC8.Designer.cs ./Jellyfin.Plugin.Pgsql/Migrations/
+cp ../Jellyfin.Plugin.Pgsql/Migrations/20260128200059_10.11.6-1.cs ./Jellyfin.Plugin.Pgsql/Migrations/
+cp ../Jellyfin.Plugin.Pgsql/Migrations/20260128200059_10.11.6-1.Designer.cs ./Jellyfin.Plugin.Pgsql/Migrations/
 cp ../Jellyfin.Plugin.Pgsql/Migrations/JellyfinDbContextModelSnapshot.cs ./Jellyfin.Plugin.Pgsql/Migrations/
 
 # Set permissions on directories
@@ -49,8 +53,12 @@ chmod 644 Dockerfile entrypoint.sh database.xml jellyfin.ruleset Jellyfin.Plugin
     Jellyfin.Plugin.Pgsql/Database/PgSqlDatabaseProvider.cs \
     Jellyfin.Plugin.Pgsql/Migrations/20250618214615_PgSQL_Init.cs \
     Jellyfin.Plugin.Pgsql/Migrations/20250618214615_PgSQL_Init.Designer.cs \
-    Jellyfin.Plugin.Pgsql/Migrations/20250913211637_AddProperParentChildRelationBaseItemWithCascade.Designer.cs \
     Jellyfin.Plugin.Pgsql/Migrations/20250913211637_AddProperParentChildRelationBaseItemWithCascade.cs \
+    Jellyfin.Plugin.Pgsql/Migrations/20250913211637_AddProperParentChildRelationBaseItemWithCascade.Designer.cs \
+    Jellyfin.Plugin.Pgsql/Migrations/20250929202529_Update_10.11-RC8.cs \
+    Jellyfin.Plugin.Pgsql/Migrations/20250929202529_Update_10.11-RC8.Designer.cs \
+    Jellyfin.Plugin.Pgsql/Migrations/20260128200059_10.11.6-1.cs \
+    Jellyfin.Plugin.Pgsql/Migrations/20260128200059_10.11.6-1.Designer.cs \
     Jellyfin.Plugin.Pgsql/Migrations/JellyfinDbContextModelSnapshot.cs
 
 tar -czf "$PACKAGE_NAME" \
