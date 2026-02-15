@@ -578,7 +578,7 @@ namespace Jellyfin.Plugin.Pgsql.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     AccessToken = table.Column<string>(type: "text", nullable: false),
                     AppName = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    AppVersion = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    AppVersion = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     DeviceName = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     DeviceId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),

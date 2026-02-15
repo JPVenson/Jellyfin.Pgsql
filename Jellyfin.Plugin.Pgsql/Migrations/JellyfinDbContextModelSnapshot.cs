@@ -1115,8 +1115,8 @@ namespace Jellyfin.Plugin.Pgsql.Migrations
 
                     b.Property<string>("AppVersion")
                         .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("timestamp with time zone");
