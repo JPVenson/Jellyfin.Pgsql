@@ -61,7 +61,18 @@ To create a new release, first sync all Jellyfin server changes then create a ne
 Then build the container
 
 
-# Migration Instructions (ADVANCED)
+# Migration Instructions (ADVANCED, UNTESTED)
 
-To migrate your JF install to a custom database (not using the docker image), first install jellyfin with the pgsql plugin and configure it to point to an existing empty database. Then proceed to run jellyfin once, this will seed the database and its migration history. Stop your JF instance after its been started once (no need to setup fully though the startup wizzard). 
-Then install the pgloader tool `apt install pgloader`. After that use the load file in `/docker/jellyfindb.load` to transfer your sqlite db into the postgres db like `pgloader /jellyfin-pgsql/jellyfindb.load` (Adapt the jellyfindb.load file accordingly to point towards your old jellyfin.db and your postgres instance).
+To migrate your JF install to a custom database (not using the docker image) follow the steps IN THIS ORDER.
+
+1. Jellyfin with the pgsql plugin and configure it to point to an existing empty database. DO NOT USE YOUR EXISTING DATA OR SQLITE LIBRARY CONFIGURE A FULLY CLEAR INSTANCE.
+2. Run jellyfin once with it configured to your empty database, this will seed the database and its migration history.
+3. Stop your JF instance after its been started once (no need to setup fully though the startup wizzard). If you did not get the setup wizzard you did something wrong!
+4. Install the pgloader tool `apt install pgloader` or see https://pgloader.readthedocs.io/en/latest/install.html.
+5. Download the [jellyfindb.load](/docker/jellyfindb.load) file
+6. Adapt the `jellyfindb.load` file accordingly to point towards your old jellyfin.db and your postgres instance. See https://pgloader.readthedocs.io/en/latest/ref/sqlite.html
+7. Use the load file in `jellyfindb.load` to transfer your sqlite db into the postgres db like `pgloader /jellyfin-pgsql/jellyfindb.load`.
+8. Move your old Data back to the jellyfin directories
+9. Start jellyfin
+
+If you get an error regarding a missing `__EFMigrationsHistory` you did not start jellyfin with a clear state.
