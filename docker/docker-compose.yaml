@@ -34,6 +34,7 @@ services:
         - CMD
         - pg_isready
       timeout: 10s
+    restart: unless-stopped
 #    user: 'uid:gid' set a different non-root user to run postgres
     volumes:
       - /path/to/jellyfin-postgres/postgres-data:/var/lib/postgresql
