@@ -65,7 +65,7 @@ Then build the container
 
 To migrate your JF install to a custom database (not using the docker image) follow the steps IN THIS ORDER.
 
-1. Jellyfin with the pgsql plugin and configure it to point to an existing empty database. DO NOT USE YOUR EXISTING DATA OR SQLITE LIBRARY CONFIGURE A FULLY CLEAR INSTANCE.
+1. Download the Jellyfin PGSQL container and configure it to point to an existing empty database and empty config directory. DO NOT USE YOUR EXISTING DATA OR SQLITE LIBRARY CONFIGURE A FULLY CLEAR INSTANCE.
 2. Run jellyfin once with it configured to your empty database, this will seed the database and its migration history.
 3. Stop your JF instance after its been started once (no need to setup fully though the startup wizzard). If you did not get the setup wizzard you did something wrong!
 4. Install the pgloader tool `apt install pgloader` or see https://pgloader.readthedocs.io/en/latest/install.html.
