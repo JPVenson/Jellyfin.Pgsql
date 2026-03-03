@@ -4,11 +4,6 @@ on:
   release:
     types:
       - released
-  push:
-    branches:
-      - master
-    paths-ignore:
-      - '**/*.md'
   workflow_dispatch:
 
 jobs:
