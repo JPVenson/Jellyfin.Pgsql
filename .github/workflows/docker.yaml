@@ -43,9 +43,9 @@ jobs:
           echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
           echo "Computed image tag: $IMAGE_TAG"
 
-          # Build full tag list; include 'latest' only when on the default branch
+          # Build full tag list; include 'latest' on release events
           TAGS="ghcr.io/jpvenson/jellyfin.pgsql:${IMAGE_TAG}"
-          if [[ "$GITHUB_REF" == "refs/heads/master" ]]; then
+          if [[ "$GITHUB_EVENT_NAME" == "release" ]]; then
             TAGS="${TAGS}"$'\n'"ghcr.io/jpvenson/jellyfin.pgsql:latest"
           fi
           # Use a multiline-safe delimiter for the output
