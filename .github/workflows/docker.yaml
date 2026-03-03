@@ -22,6 +22,44 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Determine image version
+        id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Extract the Jellyfin base version from the Dockerfile (handles optional AS alias)
+          JELLYFIN_VERSION=$(grep -oP '(?<=FROM jellyfin/jellyfin:)[^\s]+' docker/Dockerfile | head -1)
+          echo "jellyfin_version=$JELLYFIN_VERSION" >> "$GITHUB_OUTPUT"
+
+          # Query existing package versions from GHCR via the GitHub API
+          EXISTING_TAGS=$(gh api /users/jpvenson/packages/container/jellyfin.pgsql/versions \
+            --paginate --jq '.[].metadata.container.tags[]' 2>/dev/null) \
+            || { echo "Warning: could not query GHCR tags, defaulting rolling number to 1"; EXISTING_TAGS=""; }
+
+          # Find the highest rolling number already published for this Jellyfin version.
+          # Escape dots in the version so they are treated as literals in the regex.
+          ESCAPED_VERSION=$(printf '%s' "$JELLYFIN_VERSION" | sed 's/[.]/\\./g')
+          MAX_ROLLING=$(echo "$EXISTING_TAGS" \
+            | grep -oP "^${ESCAPED_VERSION}-\K[0-9]+$" \
+            | sort -n | tail -1)
+
+          NEXT=$(( ${MAX_ROLLING:-0} + 1 ))
+          IMAGE_TAG="${JELLYFIN_VERSION}-${NEXT}"
+          echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+          echo "Computed image tag: $IMAGE_TAG"
+
+          # Build full tag list; include 'latest' only when on the default branch
+          TAGS="ghcr.io/jpvenson/jellyfin.pgsql:${IMAGE_TAG}"
+          if [[ "$GITHUB_REF" == "refs/heads/master" ]]; then
+            TAGS="${TAGS}"$'\n'"ghcr.io/jpvenson/jellyfin.pgsql:latest"
+          fi
+          # Use a multiline-safe delimiter for the output
+          {
+            echo "tags<<EOF"
+            echo "$TAGS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.10.0
 
@@ -32,23 +70,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5.7.0
-        with:
-          images: ghcr.io/jpvenson/jellyfin.pgsql
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable={{is_default_branch}}
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v6.15.0
         with:
           context: .
           file: docker/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.version.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
