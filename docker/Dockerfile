@@ -31,8 +31,8 @@ RUN apt-get update && \
 COPY --from=build /app/publish/ /jellyfin-pgsql/plugin/
 COPY docker/entrypoint.sh /entrypoint.sh
 COPY docker/database.xml /jellyfin-pgsql/database.xml
-COPY docker/jellyfindb.load /jellyfin-pgsql/jellyfindb.load
-COPY docker/jellyfin.PgsqlMigrator.dll /jellyfin-pgsql/jellyfin.PgsqlMigrator.dll
+# COPY docker/jellyfindb.load /jellyfin-pgsql/jellyfindb.load
+# COPY docker/jellyfin.PgsqlMigrator.dll /jellyfin-pgsql/jellyfin.PgsqlMigrator.dll
 
 # Make entrypoint executable
 RUN chmod +x /entrypoint.sh
