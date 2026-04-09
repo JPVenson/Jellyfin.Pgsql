@@ -1,4 +1,4 @@
-# The Unoffical Postgre SQL adapter for Jellyfin Server
+# The Unofficial Postgre SQL adapter for Jellyfin Server
 
 This plugin adds postgres SQL support to [Jellyfin Server](https://github.com/jellyfin/jellyfin).
 
