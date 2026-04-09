@@ -78,4 +78,4 @@ To migrate your existing Jellyfin instance to a custom database (not using the o
 8. Move your old Data back to the Jellyfin directories
 9. Start Jellyfin
 
-If you get an error regarding a missing `__EFMigrationsHistory` you did not start jellyfin with a clear state.
+If you get an error regarding a missing `__EFMigrationsHistory` you did not start Jellyfin with a clear state.
