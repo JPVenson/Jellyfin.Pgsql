@@ -8,7 +8,7 @@ This plugin adds postgres SQL support to [Jellyfin Server](https://github.com/je
 
 # How to use it
 
-You can use your existing Jellyfin compose file and change the image accordingly to: `ghcr.io/jpvenson/jellyfin.pgsql:10.11.6-1`.
+You can use your existing Jellyfin compose file and change the image accordingly to: `ghcr.io/jpvenson/jellyfin.pgsql:10.11.8-1`.
 
 You need to add the connection parameters as enviornment variables in your compose file:
 
@@ -16,7 +16,7 @@ You need to add the connection parameters as enviornment variables in your compo
 
 services:
   jellyfin:
-    image: ghcr.io/jpvenson/jellyfin.pgsql:10.11.6-1
+    image: ghcr.io/jpvenson/jellyfin.pgsql:10.11.8-1
     volumes:
         - /path/to/config:/config
         - /path/to/cache:/cache
@@ -66,7 +66,7 @@ Then build the container.
 
 # Migration Instructions (ADVANCED, UNTESTED)
 
-To migrate your existing Jellyfin instance to a custom database (not using the ocker image) follow the steps IN THIS ORDER.
+To migrate your existing Jellyfin instance to a custom database (not using the docker image) follow the steps IN THIS ORDER.
 
 1. Download the Jellyfin PGSQL container and configure it to point to an existing empty database and empty config directory. DO NOT USE YOUR EXISTING DATA OR SQLITE LIBRARY CONFIGURE A FULLY CLEAR INSTANCE.
 2. Run Jellyfin once with it configured to your empty database, this will seed the database and its migration history.
