@@ -4,6 +4,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
+# Install native build tools required for NativeAOT/self-contained single-file publish
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends clang zlib1g-dev && \
+    rm -rf /var/lib/apt/lists/*
+
 # Copy project files
 COPY jellyfin.ruleset .
 COPY Jellyfin.Plugin.Pgsql.sln .
@@ -24,11 +29,11 @@ FROM jellyfin/jellyfin:10.11.8
 
 # Install PostgreSQL 18 client tools for backup/restore functionality
 RUN apt-get update && \
-    apt-get install -y wget ca-certificates gnupg lsb-release && \
-    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg && \
+    apt-get install -y --no-install-recommends curl ca-certificates gpg lsb-release && \
+    curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg && \
     echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
     apt-get update && \
-    apt-get install -y postgresql-client-18 && \
+    apt-get install -y --no-install-recommends postgresql-client-18 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
