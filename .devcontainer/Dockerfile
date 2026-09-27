@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/dotnet:9.0-bookworm
+FROM mcr.microsoft.com/devcontainers/dotnet:10.0-noble
 
 # Configure inner Docker daemon to use the host DNS relay (10.255.255.254) instead of
 # defaulting to 8.8.8.8/8.8.4.4, which is required when external DNS is blocked on the network.
