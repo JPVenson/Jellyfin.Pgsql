@@ -12,6 +12,12 @@ namespace Jellyfin.Plugin.Pgsql.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Remove orphaned rows BEFORE UserId becomes NOT NULL below: EF implements that change as
+            // UPDATE ... SET "UserId" = Guid.Empty WHERE "UserId" IS NULL, which the FK to Users rejects (23503).
+            // Identifiers are quoted because PostgreSQL folds unquoted names to lower case.
+            migrationBuilder.Sql("DELETE FROM \"Permissions\" WHERE \"UserId\" IS NULL OR \"UserId\" NOT IN (SELECT \"Id\" FROM \"Users\");");
+            migrationBuilder.Sql("DELETE FROM \"Preferences\" WHERE \"UserId\" IS NULL OR \"UserId\" NOT IN (SELECT \"Id\" FROM \"Users\");");
+
             migrationBuilder.DropIndex(
                 name: "IX_UserData_UserId",
                 table: "UserData");
@@ -165,9 +171,6 @@ namespace Jellyfin.Plugin.Pgsql.Migrations
                 name: "IX_UserData_UserId_Played_ItemId",
                 table: "UserData",
                 columns: new[] { "UserId", "Played", "ItemId" });
-
-            migrationBuilder.Sql("DELETE FROM Permissions WHERE UserId IS NULL OR UserId NOT IN (SELECT Id FROM Users);");
-            migrationBuilder.Sql("DELETE FROM Preferences WHERE UserId IS NULL OR UserId NOT IN (SELECT Id FROM Users);");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Preferences_UserId_Kind",
