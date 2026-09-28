@@ -287,6 +287,14 @@ namespace Jellyfin.Plugin.Pgsql.Migrations
             // one-row-per-(Name, PersonType) table to one row per lowercased name; without this index
             // that dedup scans and groups the whole table on every request.
             migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS \"IX_Peoples_NameLower\" ON \"Peoples\" (lower(\"Name\"));");
+
+            // 12.x de-duplicates items with GROUP BY "PresentationUniqueKey" + min("Id"), and PostgreSQL has no
+            // min/max aggregate for uuid (42883: function min(uuid) does not exist), so library listings fail
+            // without these. uuid compares bytewise, which matches the text ordering SQLite uses.
+            migrationBuilder.Sql("CREATE OR REPLACE FUNCTION uuid_smaller(a uuid, b uuid) RETURNS uuid LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE AS 'SELECT CASE WHEN a <= b THEN a ELSE b END';");
+            migrationBuilder.Sql("CREATE OR REPLACE FUNCTION uuid_larger(a uuid, b uuid) RETURNS uuid LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE AS 'SELECT CASE WHEN a >= b THEN a ELSE b END';");
+            migrationBuilder.Sql("CREATE OR REPLACE AGGREGATE min(uuid) (SFUNC = uuid_smaller, STYPE = uuid, COMBINEFUNC = uuid_smaller, SORTOP = <, PARALLEL = SAFE);");
+            migrationBuilder.Sql("CREATE OR REPLACE AGGREGATE max(uuid) (SFUNC = uuid_larger, STYPE = uuid, COMBINEFUNC = uuid_larger, SORTOP = >, PARALLEL = SAFE);");
         }
 
         /// <inheritdoc />
