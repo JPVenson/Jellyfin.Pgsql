@@ -180,12 +180,17 @@ public sealed class PgSqlDatabaseProvider : IJellyfinDatabaseProvider
             return;
         }
 
+        // The backup is a pg_dump --clean: it can only drop the objects that existed when it was taken, and it can't
+        // drop those while newer objects depend on them (after a failed upgrade, the new FKs on BaseItems). Without
+        // ON_ERROR_STOP, psql skipped those errors and exited 0, so a "successful" restore brought back the migration
+        // history but not the schema, and every later start failed. So restore into an emptied public schema, in one
+        // transaction: any error rolls the whole restore back, including the schema drop, and fails loudly below.
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "psql",
-                Arguments = $"--host={connectionBuilder.Host} --port={connectionBuilder.Port} --username={connectionBuilder.Username} --dbname={connectionBuilder.Database} --file=\"{backupFile}\" --no-password --quiet",
+                Arguments = $"--host={connectionBuilder.Host} --port={connectionBuilder.Port} --username={connectionBuilder.Username} --dbname={connectionBuilder.Database} --no-password --quiet --set=ON_ERROR_STOP=1 --single-transaction --command=\"DROP SCHEMA public CASCADE; CREATE SCHEMA public;\" --file=\"{backupFile}\"",
                 Environment = { ["PGPASSWORD"] = connectionBuilder.Password },
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
