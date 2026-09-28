@@ -112,19 +112,9 @@ namespace Jellyfin.Plugin.Pgsql.Migrations
             migrationBuilder.Sql("ALTER TABLE \"BaseItems\" ALTER COLUMN \"PrimaryVersionId\" TYPE uuid USING NULLIF(\"PrimaryVersionId\", '00000000-0000-0000-0000-000000000000')::uuid;");
             migrationBuilder.Sql("ALTER TABLE \"BaseItems\" ALTER COLUMN \"OwnerId\" TYPE uuid USING NULLIF(\"OwnerId\", '00000000-0000-0000-0000-000000000000')::uuid;");
 
-            // Rows that predate the composite (ParentId, SortOrder) primary key stored a null SortOrder
-            // (e.g. BoxSet and Collection children). Assign each such row a stable 0-based position within
-            // its parent so the rows stay unique once SortOrder becomes part of the primary key; otherwise
-            // they would all collapse to the column default (0) and collide during the table rebuild.
-            migrationBuilder.Sql(
-                @"UPDATE ""LinkedChildren""
-                  SET ""SortOrder"" = (
-                      SELECT COUNT(*)
-                      FROM ""LinkedChildren"" AS lc2
-                      WHERE lc2.""ParentId"" = ""LinkedChildren"".""ParentId""
-                        AND lc2.""rowid"" < ""LinkedChildren"".""rowid""
-                  )
-                  WHERE ""SortOrder"" IS NULL;");
+            // The SQLite SortOrder fix-up (numbering null SortOrders by rowid) is not carried over: on
+            // PostgreSQL it ran before LinkedChildren is created, and there is no rowid. The table is
+            // created empty below and MigrateLinkedChildren fills it with SortOrder set.
 
             migrationBuilder.CreateTable(
                 name: "LinkedChildren",
