@@ -100,23 +100,11 @@ namespace Jellyfin.Plugin.Pgsql.Migrations
                 nullable: false,
                 defaultValue: false);
 
-            migrationBuilder.AlterColumn<Guid>(
-                name: "PrimaryVersionId",
-                table: "BaseItems",
-                type: "uuid",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
-
-            migrationBuilder.AlterColumn<Guid>(
-                name: "OwnerId",
-                table: "BaseItems",
-                type: "uuid",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
+            // PostgreSQL has no implicit text -> uuid cast, so ALTER ... TYPE uuid needs USING (42804).
+            // 10.11 stored "no owner/version" as the text Guid.Empty; 12.x expects NULL, and the
+            // self-referencing FK added below rejects 00000000-... since no such item exists.
+            migrationBuilder.Sql("ALTER TABLE \"BaseItems\" ALTER COLUMN \"PrimaryVersionId\" TYPE uuid USING NULLIF(\"PrimaryVersionId\", '00000000-0000-0000-0000-000000000000')::uuid;");
+            migrationBuilder.Sql("ALTER TABLE \"BaseItems\" ALTER COLUMN \"OwnerId\" TYPE uuid USING NULLIF(\"OwnerId\", '00000000-0000-0000-0000-000000000000')::uuid;");
 
             // Rows that predate the composite (ParentId, SortOrder) primary key stored a null SortOrder
             // (e.g. BoxSet and Collection children). Assign each such row a stable 0-based position within
