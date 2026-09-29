@@ -12,6 +12,12 @@ namespace Jellyfin.Plugin.Pgsql.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Remove orphaned rows BEFORE UserId becomes NOT NULL below: EF implements that change as
+            // UPDATE ... SET "UserId" = Guid.Empty WHERE "UserId" IS NULL, which the FK to Users rejects (23503).
+            // Identifiers are quoted because PostgreSQL folds unquoted names to lower case.
+            migrationBuilder.Sql("DELETE FROM \"Permissions\" WHERE \"UserId\" IS NULL OR \"UserId\" NOT IN (SELECT \"Id\" FROM \"Users\");");
+            migrationBuilder.Sql("DELETE FROM \"Preferences\" WHERE \"UserId\" IS NULL OR \"UserId\" NOT IN (SELECT \"Id\" FROM \"Users\");");
+
             migrationBuilder.DropIndex(
                 name: "IX_UserData_UserId",
                 table: "UserData");
@@ -100,37 +106,15 @@ namespace Jellyfin.Plugin.Pgsql.Migrations
                 nullable: false,
                 defaultValue: false);
 
-            migrationBuilder.AlterColumn<Guid>(
-                name: "PrimaryVersionId",
-                table: "BaseItems",
-                type: "uuid",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
+            // PostgreSQL has no implicit text -> uuid cast, so ALTER ... TYPE uuid needs USING (42804).
+            // 10.11 stored "no owner/version" as the text Guid.Empty; 12.x expects NULL, and the
+            // self-referencing FK added below rejects 00000000-... since no such item exists.
+            migrationBuilder.Sql("ALTER TABLE \"BaseItems\" ALTER COLUMN \"PrimaryVersionId\" TYPE uuid USING NULLIF(\"PrimaryVersionId\", '00000000-0000-0000-0000-000000000000')::uuid;");
+            migrationBuilder.Sql("ALTER TABLE \"BaseItems\" ALTER COLUMN \"OwnerId\" TYPE uuid USING NULLIF(\"OwnerId\", '00000000-0000-0000-0000-000000000000')::uuid;");
 
-            migrationBuilder.AlterColumn<Guid>(
-                name: "OwnerId",
-                table: "BaseItems",
-                type: "uuid",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
-
-            // Rows that predate the composite (ParentId, SortOrder) primary key stored a null SortOrder
-            // (e.g. BoxSet and Collection children). Assign each such row a stable 0-based position within
-            // its parent so the rows stay unique once SortOrder becomes part of the primary key; otherwise
-            // they would all collapse to the column default (0) and collide during the table rebuild.
-            migrationBuilder.Sql(
-                @"UPDATE ""LinkedChildren""
-                  SET ""SortOrder"" = (
-                      SELECT COUNT(*)
-                      FROM ""LinkedChildren"" AS lc2
-                      WHERE lc2.""ParentId"" = ""LinkedChildren"".""ParentId""
-                        AND lc2.""rowid"" < ""LinkedChildren"".""rowid""
-                  )
-                  WHERE ""SortOrder"" IS NULL;");
+            // The SQLite SortOrder fix-up (numbering null SortOrders by rowid) is not carried over: on
+            // PostgreSQL it ran before LinkedChildren is created, and there is no rowid. The table is
+            // created empty below and MigrateLinkedChildren fills it with SortOrder set.
 
             migrationBuilder.CreateTable(
                 name: "LinkedChildren",
@@ -177,9 +161,6 @@ namespace Jellyfin.Plugin.Pgsql.Migrations
                 name: "IX_UserData_UserId_Played_ItemId",
                 table: "UserData",
                 columns: new[] { "UserId", "Played", "ItemId" });
-
-            migrationBuilder.Sql("DELETE FROM Permissions WHERE UserId IS NULL OR UserId NOT IN (SELECT Id FROM Users);");
-            migrationBuilder.Sql("DELETE FROM Preferences WHERE UserId IS NULL OR UserId NOT IN (SELECT Id FROM Users);");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Preferences_UserId_Kind",
@@ -306,6 +287,14 @@ namespace Jellyfin.Plugin.Pgsql.Migrations
             // one-row-per-(Name, PersonType) table to one row per lowercased name; without this index
             // that dedup scans and groups the whole table on every request.
             migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS \"IX_Peoples_NameLower\" ON \"Peoples\" (lower(\"Name\"));");
+
+            // 12.x de-duplicates items with GROUP BY "PresentationUniqueKey" + min("Id"), and PostgreSQL has no
+            // min/max aggregate for uuid (42883: function min(uuid) does not exist), so library listings fail
+            // without these. uuid compares bytewise, which matches the text ordering SQLite uses.
+            migrationBuilder.Sql("CREATE OR REPLACE FUNCTION uuid_smaller(a uuid, b uuid) RETURNS uuid LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE AS 'SELECT CASE WHEN a <= b THEN a ELSE b END';");
+            migrationBuilder.Sql("CREATE OR REPLACE FUNCTION uuid_larger(a uuid, b uuid) RETURNS uuid LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE AS 'SELECT CASE WHEN a >= b THEN a ELSE b END';");
+            migrationBuilder.Sql("CREATE OR REPLACE AGGREGATE min(uuid) (SFUNC = uuid_smaller, STYPE = uuid, COMBINEFUNC = uuid_smaller, SORTOP = <, PARALLEL = SAFE);");
+            migrationBuilder.Sql("CREATE OR REPLACE AGGREGATE max(uuid) (SFUNC = uuid_larger, STYPE = uuid, COMBINEFUNC = uuid_larger, SORTOP = >, PARALLEL = SAFE);");
         }
 
         /// <inheritdoc />
