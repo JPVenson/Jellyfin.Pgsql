@@ -2,8 +2,8 @@
 name: "PostgreSQL Database"
 guid: "27e7ad18-ea71-4b19-b1a9-6e4c2e4d5e18"
 version: "1.0.0.0"
-targetAbi: "10.11.0.0"
-framework: "net9.0"
+targetAbi: "12.4.0.0"
+framework: "net10.0"
 overview: "PostgreSQL database provider for Jellyfin"
 description: >
   Adds PostgreSQL database support to Jellyfin server. Configure using

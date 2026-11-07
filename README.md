@@ -15,7 +15,7 @@ This plugin adds postgres SQL support to [Jellyfin Server](https://github.com/je
 
 # How to use it
 
-You can use your existing Jellyfin compose file and change the image accordingly to: `ghcr.io/jpvenson/jellyfin.pgsql:10.11.11-1`.
+You can use your existing Jellyfin compose file and change the image accordingly to: `ghcr.io/jpvenson/jellyfin.pgsql:12.4-1`.
 
 You need to add the connection parameters as enviornment variables in your compose file:
 
@@ -23,7 +23,7 @@ You need to add the connection parameters as enviornment variables in your compo
 
 services:
   jellyfin:
-    image: ghcr.io/jpvenson/jellyfin.pgsql:10.11.11-1
+    image: ghcr.io/jpvenson/jellyfin.pgsql:12.4-1
     volumes:
         - /path/to/config:/config
         - /path/to/cache:/cache
@@ -54,7 +54,7 @@ Update the `database.xml` file to switch to the plugin as its database provider:
 <DatabaseConfigurationOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <DatabaseType>PLUGIN_PROVIDER</DatabaseType>
   <CustomProviderOptions>
-    <PluginAssembly>../../../Jellyfin.Plugin.Pgsql/bin/debug/net9.0/Jellyfin.Plugin.Pgsql.dll</PluginAssembly>
+    <PluginAssembly>../../../Jellyfin.Plugin.Pgsql/bin/debug/net10.0/Jellyfin.Plugin.Pgsql.dll</PluginAssembly>
     <PluginName>PostgreSQL</PluginName>
     <ConnectionString>CONNECTION_STRING_TO_LOCAL_PGSQL_SERVER</ConnectionString>
   </CustomProviderOptions>
