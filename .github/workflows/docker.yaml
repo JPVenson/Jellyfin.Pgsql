@@ -22,12 +22,18 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Image lives at ghcr.io/<owner>/<repo>, lowercased as ghcr requires (jpvenson/jellyfin.pgsql upstream)
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          IMAGE_NAME="${GITHUB_REPOSITORY#*/}"
+          IMAGE_NAME="${IMAGE_NAME,,}"
+          IMAGE="ghcr.io/${OWNER}/${IMAGE_NAME}"
+
           # Extract the Jellyfin base version from the Dockerfile (handles optional AS alias)
           JELLYFIN_VERSION=$(grep -oP '(?<=FROM jellyfin/jellyfin:)[^\s]+' docker/Dockerfile | head -1)
           echo "jellyfin_version=$JELLYFIN_VERSION" >> "$GITHUB_OUTPUT"
 
           # Query existing package versions from GHCR via the GitHub API
-          EXISTING_TAGS=$(gh api /users/jpvenson/packages/container/jellyfin.pgsql/versions \
+          EXISTING_TAGS=$(gh api "/users/${OWNER}/packages/container/${IMAGE_NAME}/versions" \
             --paginate --jq '.[].metadata.container.tags[]' 2>/dev/null) \
             || { echo "Warning: could not query GHCR tags, defaulting rolling number to 1"; EXISTING_TAGS=""; }
 
@@ -44,9 +50,9 @@ jobs:
           echo "Computed image tag: $IMAGE_TAG"
 
           # Build full tag list; include 'latest' on release events
-          TAGS="ghcr.io/jpvenson/jellyfin.pgsql:${IMAGE_TAG}"
+          TAGS="${IMAGE}:${IMAGE_TAG}"
           if [[ "$GITHUB_EVENT_NAME" == "release" ]]; then
-            TAGS="${TAGS}"$'\n'"ghcr.io/jpvenson/jellyfin.pgsql:latest"
+            TAGS="${TAGS}"$'\n'"${IMAGE}:latest"
           fi
           # Use a multiline-safe delimiter for the output
           {
