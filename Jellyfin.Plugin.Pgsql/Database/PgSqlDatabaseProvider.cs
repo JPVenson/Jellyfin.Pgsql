@@ -83,6 +83,34 @@ public sealed class PgSqlDatabaseProvider : IJellyfinDatabaseProvider
     }
 
     /// <inheritdoc/>
+    public async Task RefreshStatistics(CancellationToken cancellationToken)
+    {
+        if (DbContextFactory is null)
+        {
+            return;
+        }
+
+        var context = await DbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        await using (context.ConfigureAwait(false))
+        {
+            if (!context.Database.IsNpgsql())
+            {
+                return;
+            }
+
+            // Folders and the seeded placeholder exist before any library has been scanned; statistics taken
+            // while the library is empty would only mislead the planner until autovacuum catches up.
+            if (!await context.BaseItems.AnyAsync(e => !e.IsFolder && e.Type != "PLACEHOLDER", cancellationToken).ConfigureAwait(false))
+            {
+                return;
+            }
+
+            _logger.LogInformation("Analyzing PostgreSQL database");
+            await context.Database.ExecuteSqlRawAsync("ANALYZE", cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <inheritdoc/>
     public void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Use C collation for consistent case-sensitive behavior matching SQLite BINARY
