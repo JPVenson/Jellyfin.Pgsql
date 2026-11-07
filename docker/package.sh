@@ -21,43 +21,25 @@ cp ../jellyfin.ruleset ./
 cp ../Jellyfin.Plugin.Pgsql.sln ./
 cp ../build.yaml ./
 
-# Copy only the source code files needed for the build
-mkdir -p Jellyfin.Plugin.Pgsql/Configuration
-mkdir -p Jellyfin.Plugin.Pgsql/Database
-mkdir -p Jellyfin.Plugin.Pgsql/Migrations
+# Copy the source code files needed for the build: the whole project, without build output
+(cd .. && tar -cf - --exclude='bin' --exclude='obj' --exclude='.DS_Store' Jellyfin.Plugin.Pgsql) | tar -xf -
 
-cp ../Jellyfin.Plugin.Pgsql/Jellyfin.Plugin.Pgsql.csproj ./Jellyfin.Plugin.Pgsql/
-cp ../Jellyfin.Plugin.Pgsql/Plugin.cs ./Jellyfin.Plugin.Pgsql/
-cp ../Jellyfin.Plugin.Pgsql/Configuration/PluginConfiguration.cs ./Jellyfin.Plugin.Pgsql/Configuration/
-cp ../Jellyfin.Plugin.Pgsql/Configuration/configPage.html ./Jellyfin.Plugin.Pgsql/Configuration/
-cp ../Jellyfin.Plugin.Pgsql/Database/PgSqlDatabaseProvider.cs ./Jellyfin.Plugin.Pgsql/Database/
-cp ../Jellyfin.Plugin.Pgsql/Migrations/20250618214615_PgSQL_Init.cs ./Jellyfin.Plugin.Pgsql/Migrations/
-cp ../Jellyfin.Plugin.Pgsql/Migrations/20250618214615_PgSQL_Init.Designer.cs ./Jellyfin.Plugin.Pgsql/Migrations/
-cp ../Jellyfin.Plugin.Pgsql/Migrations/20250913211637_AddProperParentChildRelationBaseItemWithCascade.Designer.cs ./Jellyfin.Plugin.Pgsql/Migrations/
-cp ../Jellyfin.Plugin.Pgsql/Migrations/20250913211637_AddProperParentChildRelationBaseItemWithCascade.cs ./Jellyfin.Plugin.Pgsql/Migrations/
-cp ../Jellyfin.Plugin.Pgsql/Migrations/JellyfinDbContextModelSnapshot.cs ./Jellyfin.Plugin.Pgsql/Migrations/
+# The Dockerfile copies docker/entrypoint.sh and docker/database.xml from the build context
+mkdir -p docker
+cp entrypoint.sh database.xml docker/
 
 # Set permissions on directories
-chmod 755 Jellyfin.Plugin.Pgsql Jellyfin.Plugin.Pgsql/Configuration Jellyfin.Plugin.Pgsql/Database Jellyfin.Plugin.Pgsql/Migrations
+find Jellyfin.Plugin.Pgsql docker -type d -exec chmod 755 {} +
 
 # Set permissions on files
-chmod 644 Dockerfile entrypoint.sh database.xml jellyfin.ruleset Jellyfin.Plugin.Pgsql.sln build.yaml \
-    Jellyfin.Plugin.Pgsql/Jellyfin.Plugin.Pgsql.csproj \
-    Jellyfin.Plugin.Pgsql/Plugin.cs \
-    Jellyfin.Plugin.Pgsql/Configuration/PluginConfiguration.cs \
-    Jellyfin.Plugin.Pgsql/Configuration/configPage.html \
-    Jellyfin.Plugin.Pgsql/Database/PgSqlDatabaseProvider.cs \
-    Jellyfin.Plugin.Pgsql/Migrations/20250618214615_PgSQL_Init.cs \
-    Jellyfin.Plugin.Pgsql/Migrations/20250618214615_PgSQL_Init.Designer.cs \
-    Jellyfin.Plugin.Pgsql/Migrations/20250913211637_AddProperParentChildRelationBaseItemWithCascade.Designer.cs \
-    Jellyfin.Plugin.Pgsql/Migrations/20250913211637_AddProperParentChildRelationBaseItemWithCascade.cs \
-    Jellyfin.Plugin.Pgsql/Migrations/JellyfinDbContextModelSnapshot.cs
+chmod 644 Dockerfile docker/entrypoint.sh docker/database.xml jellyfin.ruleset Jellyfin.Plugin.Pgsql.sln build.yaml
+find Jellyfin.Plugin.Pgsql -type f -exec chmod 644 {} +
 
 tar -czf "$PACKAGE_NAME" \
-    --uid=0 --gid=0 \
+    --owner=0 --group=0 \
     Dockerfile \
-    entrypoint.sh \
-    database.xml \
+    docker/entrypoint.sh \
+    docker/database.xml \
     jellyfin.ruleset \
     Jellyfin.Plugin.Pgsql.sln \
     build.yaml \
@@ -65,7 +47,7 @@ tar -czf "$PACKAGE_NAME" \
 
 # Clean up temporary files
 rm jellyfin.ruleset Jellyfin.Plugin.Pgsql.sln build.yaml
-rm -rf Jellyfin.Plugin.Pgsql/
+rm -rf Jellyfin.Plugin.Pgsql/ docker/
 
 # Show package size
 SIZE=$(ls -lh "$PACKAGE_NAME" | awk '{print $5}')
@@ -74,6 +56,6 @@ echo "Package created: $PACKAGE_NAME ($SIZE)"
 echo ""
 echo "To use on another system:"
 echo "1. Copy $PACKAGE_NAME to the target system"
-echo "2. Extract: tar -xzf $PACKAGE_NAME"
+echo "2. Extract into an empty directory: tar -xzf $PACKAGE_NAME"
 echo "3. Build: docker build -t jellyfin-pgsql ."
 echo "4. Run with PostgreSQL environment variables"
