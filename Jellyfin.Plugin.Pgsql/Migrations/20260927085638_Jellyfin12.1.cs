@@ -1,5 +1,4 @@
-﻿#pragma warning disable CA1861 // Avoid constant arrays as arguments
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable

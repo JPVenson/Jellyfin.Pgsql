@@ -17,7 +17,7 @@ fi
 
 # Create the tar.gz with all required files
 # Copy files to avoid relative paths and set proper permissions
-cp ../jellyfin.ruleset ./
+cp ../.editorconfig ./
 cp ../Jellyfin.Plugin.Pgsql.sln ./
 cp ../build.yaml ./
 
@@ -32,7 +32,7 @@ cp entrypoint.sh database.xml docker/
 find Jellyfin.Plugin.Pgsql docker -type d -exec chmod 755 {} +
 
 # Set permissions on files
-chmod 644 Dockerfile docker/entrypoint.sh docker/database.xml jellyfin.ruleset Jellyfin.Plugin.Pgsql.sln build.yaml
+chmod 644 Dockerfile docker/entrypoint.sh docker/database.xml .editorconfig Jellyfin.Plugin.Pgsql.sln build.yaml
 find Jellyfin.Plugin.Pgsql -type f -exec chmod 644 {} +
 
 tar -czf "$PACKAGE_NAME" \
@@ -40,13 +40,13 @@ tar -czf "$PACKAGE_NAME" \
     Dockerfile \
     docker/entrypoint.sh \
     docker/database.xml \
-    jellyfin.ruleset \
+    .editorconfig \
     Jellyfin.Plugin.Pgsql.sln \
     build.yaml \
     Jellyfin.Plugin.Pgsql/
 
 # Clean up temporary files
-rm jellyfin.ruleset Jellyfin.Plugin.Pgsql.sln build.yaml
+rm .editorconfig Jellyfin.Plugin.Pgsql.sln build.yaml
 rm -rf Jellyfin.Plugin.Pgsql/ docker/
 
 # Show package size

@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy project files
-COPY jellyfin.ruleset .
+COPY .editorconfig .
 COPY Jellyfin.Plugin.Pgsql.sln .
 COPY build.yaml .
 COPY Jellyfin.Plugin.Pgsql/ ./Jellyfin.Plugin.Pgsql/
